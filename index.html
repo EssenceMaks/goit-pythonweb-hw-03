@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -12,9 +12,18 @@
       integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/styles/style.css" />
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   </head>
   <body>
+    <!-- Кнопка переключения темы -->
+    <div class="theme-toggle-wrapper">
+      <button id="theme-toggle" class="theme-toggle" title="Переключить тему">
+        <i class="fas fa-sun"></i>
+      </button>
+    </div>
+    
     <header>
       <nav
         class="navbar navbar-expand navbar-dark bg-dark"
@@ -22,7 +31,7 @@
       >
         <div class="container-fluid">
           <a class="navbar-brand" href="#">
-            <img src="/logo.png" alt="logo" />
+            <img src="/styles/logo.png" alt="logo" />
           </a>
           <div class="collapse navbar-collapse" id="navbarsExample02">
             <ul class="navbar-nav me-auto">
@@ -54,5 +63,43 @@
       {% include "stack_plan_block.html" %}
     </main>
     {% endblock %}
+
+    <!-- JavaScript для переключения темы -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Проверяем сохраненную тему в localStorage
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+        
+        // Обработчик клика по кнопке переключения темы
+        const themeToggle = document.getElementById('theme-toggle');
+        themeToggle.addEventListener('click', function() {
+          // Получаем текущую тему
+          const currentTheme = document.documentElement.getAttribute('data-theme');
+          // Устанавливаем новую тему
+          const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          
+          // Применяем новую тему
+          document.documentElement.setAttribute('data-theme', newTheme);
+          // Сохраняем в localStorage
+          localStorage.setItem('theme', newTheme);
+          // Обновляем иконку
+          updateThemeIcon(newTheme);
+        });
+        
+        // Функция для обновления иконки в зависимости от темы
+        function updateThemeIcon(theme) {
+          const icon = document.querySelector('#theme-toggle i');
+          if (theme === 'dark') {
+            icon.className = 'fas fa-sun';
+            icon.style.color = '#ffbf00';  // Делаем солнышко жёлтым
+          } else {
+            icon.className = 'fas fa-moon';
+            icon.style.color = '';  // Возвращаем стандартный цвет
+          }
+        }
+      });
+    </script>
   </body>
 </html>

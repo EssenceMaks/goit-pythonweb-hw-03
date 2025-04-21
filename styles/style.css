@@ -1,0 +1,95 @@
+:root {
+  --bg-color: #fff;
+  --bg-gradient: linear-gradient(180deg, #eee, #fff 100px, #fff);
+  --text-color: #212529;
+  --link-color: #007bff;
+  --heading-color: #343a40;
+  --border-color: #dee2e6;
+  --nav-bg: #343a40;
+  --nav-text: #fff;
+  --card-bg: #fff;
+  --card-border: rgba(0, 0, 0, 0.125);
+}
+
+[data-theme="dark"] {
+  --bg-color: #121212;
+  --bg-gradient: linear-gradient(180deg, #1e1e1e, #121212 100px, #121212);
+  --text-color: #f8f9fa;
+  --link-color: #6ea8fe;
+  --heading-color: #f8f9fa;
+  --border-color: #495057;
+  --nav-bg: #212529;
+  --nav-text: #f8f9fa;
+  --card-bg: #212529;
+  --card-border: rgba(255, 255, 255, 0.125);
+}
+
+html {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+body {
+  flex: 1;
+  background-image: var(--bg-gradient);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container {
+  max-width: 960px;
+}
+
+textarea {
+  height: 250px;
+}
+
+/* Navbar styling */
+.navbar {
+  background-color: var(--nav-bg) !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: var(--nav-text);
+}
+
+/* Card styling */
+.card {
+  background-color: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+.card-header {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: var(--border-color);
+}
+
+/* Theme toggle button */
+.theme-toggle-wrapper {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 1100;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  color: #ff6b08;
+  font-size: 1.5rem;
+  cursor: pointer;
+  border-radius: 5px;
+  border: solid 1px #ff6b08;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.theme-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.theme-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}

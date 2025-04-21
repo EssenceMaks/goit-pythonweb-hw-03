@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Шляхи до файлів
 BASE_DIR = pathlib.Path(__file__).parent
-STATIC_DIR = BASE_DIR
+STATIC_DIR = BASE_DIR / 'styles'
 TEMPLATES_DIR = BASE_DIR / 'templates'
 STORAGE_DIR = BASE_DIR / 'storage'
 DATA_FILE = STORAGE_DIR / 'data.json'
@@ -90,13 +90,13 @@ async def read_messages(request):
     return {"messages": storage_data, "active_page": "read"}
 
 # Обробка статичних файлів
-@routes.get('/style.css')
+@routes.get('/styles/style.css')
 async def styles(request):
-    return web.FileResponse(BASE_DIR / 'style.css')
+    return web.FileResponse(STATIC_DIR / 'style.css')
 
-@routes.get('/logo.png')
+@routes.get('/styles/logo.png')
 async def logo(request):
-    return web.FileResponse(BASE_DIR / 'logo.png')
+    return web.FileResponse(STATIC_DIR / 'logo.png')
 
 async def init_app():
     # Ініціалізація додатку
