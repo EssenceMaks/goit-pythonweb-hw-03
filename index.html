@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Python{% endblock %}</title>
-    <!-- CSS only -->
+    <!-- Лише CSS -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -13,11 +13,11 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="/styles/style.css" />
-    <!-- Font Awesome для иконок -->
+    <!-- Font Awesome для іконок -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   </head>
   <body>
-    <!-- Кнопка переключения темы -->
+    <!-- Кнопка перемикання теми -->
     <div class="theme-toggle-wrapper">
       <button id="theme-toggle" class="theme-toggle" title="Переключить тему">
         <i class="fas fa-sun"></i>
@@ -64,39 +64,39 @@
     </main>
     {% endblock %}
 
-    <!-- JavaScript для переключения темы -->
+    <!-- JavaScript для перемикання теми -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // Проверяем сохраненную тему в localStorage
+        // Перевіряємо збережену тему в localStorage
         const savedTheme = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
         updateThemeIcon(savedTheme);
         
-        // Обработчик клика по кнопке переключения темы
+        // Обробник кліку по кнопці перемикання теми
         const themeToggle = document.getElementById('theme-toggle');
         themeToggle.addEventListener('click', function() {
-          // Получаем текущую тему
+          // Отримуємо поточну тему
           const currentTheme = document.documentElement.getAttribute('data-theme');
-          // Устанавливаем новую тему
+          // Встановлюємо нову тему
           const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
           
-          // Применяем новую тему
+          // Застосовуємо нову тему
           document.documentElement.setAttribute('data-theme', newTheme);
-          // Сохраняем в localStorage
+          // Зберігаємо в localStorage
           localStorage.setItem('theme', newTheme);
-          // Обновляем иконку
+          // Оновлюємо іконку
           updateThemeIcon(newTheme);
         });
         
-        // Функция для обновления иконки в зависимости от темы
+        // Функція для оновлення іконки в залежності від теми
         function updateThemeIcon(theme) {
           const icon = document.querySelector('#theme-toggle i');
           if (theme === 'dark') {
             icon.className = 'fas fa-sun';
-            icon.style.color = '#ffbf00';  // Делаем солнышко жёлтым
+            icon.style.color = '#ffbf00';  // Робимо сонечко жовтим
           } else {
             icon.className = 'fas fa-moon';
-            icon.style.color = '';  // Возвращаем стандартный цвет
+            icon.style.color = '';  // Повертаємо стандартний колір
           }
         }
       });

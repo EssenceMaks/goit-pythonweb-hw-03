@@ -3,6 +3,7 @@ import json
 import logging
 import pathlib
 import datetime
+import os
 import aiohttp
 from aiohttp import web
 import aiohttp_jinja2
@@ -80,6 +81,33 @@ async def message_post(request):
     # Перенаправлення на сторінку читання повідомлень
     return web.HTTPFound('/read')
 
+# Обробка видалення повідомлення
+@routes.post('/delete/{timestamp}')
+async def delete_message(request):
+    timestamp = request.match_info['timestamp']
+    
+    try:
+        # Завантажуємо поточні дані
+        with open(DATA_FILE, 'r') as fd:
+            storage_data = json.load(fd)
+        
+        # Перевіряємо, чи існує повідомлення з вказаним timestamp
+        if timestamp in storage_data:
+            # Видаляємо повідомлення
+            del storage_data[timestamp]
+            
+            # Зберігаємо оновлені дані
+            with open(DATA_FILE, 'w') as fd:
+                json.dump(storage_data, fd, indent=2)
+            
+            return web.Response(status=200)
+        else:
+            return web.Response(status=404, text="Повідомлення не знайдено")
+            
+    except Exception as e:
+        logging.error(f"Помилка при видаленні повідомлення: {e}")
+        return web.Response(status=500, text="Помилка при видаленні повідомлення")
+
 # Читання повідомлень через шаблон Jinja2
 @routes.get('/read')
 @aiohttp_jinja2.template('read.html')
@@ -128,10 +156,12 @@ async def init_app():
     return app
 
 def main():
+    # Отримуємо порт з змінної середовища або використовуємо 3000 за замовчуванням
+    port = int(os.environ.get("PORT", 3000))
     # Запуск додатку
     loop = asyncio.get_event_loop()
     app = loop.run_until_complete(init_app())
-    web.run_app(app, host='0.0.0.0', port=3000)
+    web.run_app(app, host='0.0.0.0', port=port)
 
 if __name__ == '__main__':
     main()

@@ -1,31 +1,77 @@
 {% extends "index.html" %}
 
-{% block title %}Повідомлення{% endblock %}
+{% block title %}Messages{% endblock %}
 
-{% block header_title %}Повідомлення{% endblock %}
-{% block header_description %}Всі збережені Повідомлення{% endblock %}
+{% block header_title %}Messages{% endblock %}
+{% block header_description %}All saved messages{% endblock %}
 
 {% block content %}
 <main class="container">
-  <div class="row">
-    <div class="col-12">
-      {% if messages %}
-        {% for timestamp, msg in messages.items() %}
-          <div class="card mb-3">
-            <div class="card-header">
-              <strong>{{ msg.username }}</strong> <small class="text-muted">{{ timestamp }}</small>
-            </div>
-            <div class="card-body">
-              <p class="card-text">{{ msg.message }}</p>
-            </div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="alert alert-info">
-          Пока нет сообщений
+    <div class="row">
+        <div class="col-12">
+            {% if messages %}
+                {% for timestamp, msg in messages.items() %}
+                    <div class="card mb-3 message-card" id="msg-{{ timestamp }}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ msg.username }}</strong> <small class="text-muted">{{ timestamp }}</small>
+                            </div>
+                            <button class="btn btn-sm btn-danger delete-message" data-timestamp="{{ timestamp }}" title="Delete message">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ msg.message }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">
+                    No messages yet
+                </div>
+            {% endif %}
         </div>
-      {% endif %}
     </div>
-  </div>
 </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Find all delete buttons
+        const deleteButtons = document.querySelectorAll('.delete-message');
+        
+        // Add event listener for each button
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const timestamp = this.getAttribute('data-timestamp');
+                const messageCard = document.getElementById(`msg-${timestamp}`);
+                
+                if (confirm('Are you sure you want to delete this message?')) {
+                    // Send delete request
+                    fetch(`/delete/${timestamp}`, {
+                        method: 'POST'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // If deletion is successful, remove the message card
+                            messageCard.remove();
+                            
+                            // Check if there are any messages left
+                            const remainingMessages = document.querySelectorAll('.message-card');
+                            if (remainingMessages.length === 0) {
+                                const container = document.querySelector('.col-12');
+                                container.innerHTML = '<div class="alert alert-info">No messages yet</div>';
+                            }
+                        } else {
+                            alert('An error occurred while deleting the message');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while deleting the message');
+                    });
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

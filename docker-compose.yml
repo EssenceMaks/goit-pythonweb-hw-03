@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+    volumes:
+      - message_data:/app/storage
+    restart: unless-stopped
+    # Позволяет контейнеру обрабатывать сигналы завершения корректно
+    init: true
+    # Устанавливаем память для контейнера
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+volumes:
+  message_data:
+    name: message_app_data
