@@ -1,0 +1,16 @@
+{% extends "index.html" %}
+
+{% block title %}Ошибка 404{% endblock %}
+
+{% block header_title %}404{% endblock %}
+{% block header_description %}Not Found{% endblock %}
+
+{% block content %}
+<main class="container">
+  <div class="alert alert-danger text-center">
+    <h2>Сторінку не знайдено</h2>
+    <p>На жаль, запитана вами сторінка не існує.</p>
+    <a href="/" class="btn btn-primary">Повернутися на головну</a>
+  </div>
+</main>
+{% endblock %}

@@ -8,16 +8,17 @@ from aiohttp import web
 import aiohttp_jinja2
 import jinja2
 
-# Настройка логирования
+# Налаштування логування
 logging.basicConfig(level=logging.INFO)
 
-# Пути к файлам
+# Шляхи до файлів
 BASE_DIR = pathlib.Path(__file__).parent
 STATIC_DIR = BASE_DIR
+TEMPLATES_DIR = BASE_DIR / 'templates'
 STORAGE_DIR = BASE_DIR / 'storage'
 DATA_FILE = STORAGE_DIR / 'data.json'
 
-# Инициализация данных, если файл пустой
+# Ініціалізація даних, якщо файл порожній
 def init_data_file():
     if not STORAGE_DIR.exists():
         STORAGE_DIR.mkdir(exist_ok=True)
@@ -26,66 +27,69 @@ def init_data_file():
         with open(DATA_FILE, 'w') as fd:
             json.dump({}, fd)
 
-# Глобальный обработчик ошибок 404
+# Глобальний обробник помилок 404
+@aiohttp_jinja2.template('error.html')
 async def handle_404(request):
-    return web.FileResponse(BASE_DIR / 'error.html', status=404)
+    return {"active_page": "none"}
 
-# Маршруты и обработчики
+# Маршрути та обробники
 routes = web.RouteTableDef()
 
-# Главная страница
+# Головна сторінка
 @routes.get('/')
+@aiohttp_jinja2.template('index.html')
 async def index(request):
-    return web.FileResponse(BASE_DIR / 'index.html')
+    return {"active_page": "home"}
 
-# Страница с сообщением
+# Сторінка з повідомленням
 @routes.get('/message.html')
+@aiohttp_jinja2.template('message.html')
 async def message_get(request):
-    return web.FileResponse(BASE_DIR / 'message.html')
+    return {"active_page": "message"}
 
-# Обработка формы
+# Обробка форми
 @routes.post('/message')
 async def message_post(request):
     data = await request.post()
     username = data.get('username')
     message = data.get('message')
     
-    # Валидация входных данных
+    # Валідація вхідних даних
     if not username or not username.strip():
-        return web.Response(text="Имя пользователя не может быть пустым", status=400)
+        return web.Response(text="Ім'я користувача не може бути порожнім", status=400)
     
     if not message or not message.strip():
-        return web.Response(text="Сообщение не может быть пустым", status=400)
+        return web.Response(text="Повідомлення не може бути порожнім", status=400)
     
     timestamp = datetime.datetime.now().isoformat()
     
-    # Загрузка текущих данных
+    # Завантаження поточних даних
     with open(DATA_FILE, 'r') as fd:
         storage_data = json.load(fd)
     
-    # Добавление нового сообщения
+    # Додавання нового повідомлення
     storage_data[timestamp] = {
         "username": username,
         "message": message
     }
     
-    # Сохранение обновленных данных
+    # Збереження оновлених даних
     with open(DATA_FILE, 'w') as fd:
         json.dump(storage_data, fd, indent=2)
     
-    # Перенаправление на страницу чтения сообщений
+    # Перенаправлення на сторінку читання повідомлень
     return web.HTTPFound('/read')
 
-# Чтение сообщений через шаблон Jinja2
+# Читання повідомлень через шаблон Jinja2
 @routes.get('/read')
 @aiohttp_jinja2.template('read.html')
 async def read_messages(request):
     with open(DATA_FILE, 'r') as fd:
         storage_data = json.load(fd)
     
-    return {"messages": storage_data}
+    return {"messages": storage_data, "active_page": "read"}
 
-# Обработка статических файлов
+# Обробка статичних файлів
 @routes.get('/style.css')
 async def styles(request):
     return web.FileResponse(BASE_DIR / 'style.css')
@@ -94,28 +98,20 @@ async def styles(request):
 async def logo(request):
     return web.FileResponse(BASE_DIR / 'logo.png')
 
-# Обработка всех остальных GET маршрутов - устарело и заменено на middleware
-@routes.get('/{name}')
-async def error_handler(request):
-    name = request.match_info.get('name', '')
-    if name not in ['', 'index.html', 'message.html', 'style.css', 'logo.png', 'read']:
-        return web.FileResponse(BASE_DIR / 'error.html', status=404)
-    raise web.HTTPNotFound()
-
 async def init_app():
-    # Инициализация приложения
+    # Ініціалізація додатку
     app = web.Application()
     
-    # Настройка шаблонизатора Jinja2
+    # Налаштування шаблонізатора Jinja2
     aiohttp_jinja2.setup(
         app,
-        loader=jinja2.FileSystemLoader(str(BASE_DIR))
+        loader=jinja2.FileSystemLoader([str(BASE_DIR), str(TEMPLATES_DIR)])
     )
     
-    # Регистрация маршрутов
+    # Реєстрація маршрутів
     app.add_routes(routes)
     
-    # Добавляем глобальный обработчик 404 ошибок через middleware
+    # Додаємо глобальний обробник 404 помилок через middleware
     @web.middleware
     async def error_middleware(request, handler):
         try:
@@ -123,16 +119,16 @@ async def init_app():
         except web.HTTPNotFound:
             return await handle_404(request)
     
-    # Применяем middleware к приложению
+    # Застосовуємо middleware до додатку
     app.middlewares.append(error_middleware)
     
-    # Инициализация файла данных
+    # Ініціалізація файлу даних
     init_data_file()
     
     return app
 
 def main():
-    # Запуск приложения
+    # Запуск додатку
     loop = asyncio.get_event_loop()
     app = loop.run_until_complete(init_app())
     web.run_app(app, host='0.0.0.0', port=3000)

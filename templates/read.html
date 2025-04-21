@@ -1,0 +1,31 @@
+{% extends "index.html" %}
+
+{% block title %}Повідомлення{% endblock %}
+
+{% block header_title %}Повідомлення{% endblock %}
+{% block header_description %}Всі збережені Повідомлення{% endblock %}
+
+{% block content %}
+<main class="container">
+  <div class="row">
+    <div class="col-12">
+      {% if messages %}
+        {% for timestamp, msg in messages.items() %}
+          <div class="card mb-3">
+            <div class="card-header">
+              <strong>{{ msg.username }}</strong> <small class="text-muted">{{ timestamp }}</small>
+            </div>
+            <div class="card-body">
+              <p class="card-text">{{ msg.message }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="alert alert-info">
+          Пока нет сообщений
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</main>
+{% endblock %}
